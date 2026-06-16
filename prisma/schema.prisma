@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            BigInt   @id
+  username      String?
+  firstName     String?
+  lastName      String?
+  languageCode  String?
+  isBot         Boolean  @default(false)
+  
+  settings      Settings?
+  chats         Chat[]
+  usageLogs     UsageLog[]
+  blocked       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Settings {
+  id            String   @id @default(uuid())
+  userId        BigInt   @unique
+  user          User     @relation(fields: [userId], references: [id])
+  
+  preferredModel String  @default("gpt-4o")
+  language      String   @default("ar")
+  translationMode String @default("professional")
+  notifications Boolean  @default(true)
+}
+
+model Chat {
+  id            String   @id @default(uuid())
+  userId        BigInt
+  user          User     @relation(fields: [userId], references: [id])
+  
+  title         String?
+  pinned        Boolean  @default(false)
+  messages      Message[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Message {
+  id            String   @id @default(uuid())
+  chatId        String
+  chat          Chat     @relation(fields: [chatId], references: [id])
+  
+  role          String   // "user" | "assistant" | "system"
+  content       String
+  type          String   @default("text") // "text" | "image" | "file" | "audio"
+  metadata      Json?    // For storing file URLs, image descriptions, etc.
+  createdAt     DateTime @default(now())
+}
+
+model UsageLog {
+  id            String   @id @default(uuid())
+  userId        BigInt
+  user          User     @relation(fields: [userId], references: [id])
+  
+  model         String
+  promptTokens  Int
+  completionTokens Int
+  action        String   // "chat" | "vision" | "audio" | "file"
+  createdAt     DateTime @default(now())
+}
+
+model Broadcast {
+  id            String   @id @default(uuid())
+  message       String
+  sentCount     Int      @default(0)
+  totalTarget   Int
+  status        String   // "pending" | "sent" | "failed"
+  createdAt     DateTime @default(now())
+}
