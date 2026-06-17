@@ -1,0 +1,6 @@
+{
+  "name": "Telegram Webhook Bot",
+  "description": "Professional Telegram Webhook Bot for Railway running via secure Webhooks with PostgreSQL (Prisma) database tracking and Redis sessions/rate limiting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
